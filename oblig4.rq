@@ -1,0 +1,30 @@
+# Write a CONSTRUCT SPARQL query that produces a FOAF file for Homer, 
+# adding his name, a foaf:knows relationship to his relatives 
+# and the name of his relatives.
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX sim: <http://www.ifi.uio.no/IN3060/simpsons#>
+PREFIX fam: <http://www.ifi.uio.no/IN3060/family#>
+
+CONSTRUCT {
+    sim:Homer a foaf:Person ;
+              foaf:name ?name ;
+              foaf:knows ?relative .
+    
+    ?relative a foaf:Person ;
+              foaf:name ?relativename .
+}
+WHERE { 
+    {
+        sim:Homer foaf:name ?name .
+
+        ?relative fam:isRelativeOf sim:Homer ;
+                  foaf:name ?relativename .
+    } UNION {
+        sim:Homer fam:isRelativeOf ?relative ;
+                  foaf:name ?name .
+
+        ?relative foaf:name ?relativename .
+    }
+}
